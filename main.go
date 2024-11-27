@@ -6,14 +6,16 @@ import (
 	"fmt"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	"os"
 )
 
 func main() {
 	ctx := context.Background()
-	projectID := "{projectID}"
+	projectID := os.Getenv("HANDSON_BIG_QUERY_ID")
 
-	key := "{jsonFile}"
-	client, err := bq.NewClient(ctx, projectID, option.WithServiceAccountFile(key))
+	key := os.Getenv("BIGQUERY_JSON")
+	// 認証情報をJSONファイルから読み込む
+	client, err := bq.NewClient(ctx, projectID, option.WithCredentialsFile(key))
 
 	if err != nil {
 		fmt.Println("Failed to create client:%v", err)
@@ -24,7 +26,7 @@ func main() {
 }
 
 func query(ctx context.Context, client *bq.Client) {
-	q := "SELECT purchased_at, store, item_name, amount, member_id, FROM `sample_ice_cream.ice_cream_sales`"
+	q := "SELECT purchased_at, store, item_name, amount, member_id FROM `sample_ice_cream.ice_cream_sales`"
 
 	// クエリ実行
 	it, err := client.Query(q).Read(ctx)
