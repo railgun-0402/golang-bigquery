@@ -7,4 +7,4 @@ bigqueryからデータ操作を実施するためのリポジトリ。
 
 ## 使用技術
 
-<img src="https://skillicons.dev/icons?i=go" /> <br /><br />
+<img src="https://skillicons.dev/icons?i=go,gcp" /> <br /><br />
