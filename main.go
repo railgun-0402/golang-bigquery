@@ -11,7 +11,8 @@ import (
 
 func main() {
 	ctx := context.Background()
-	projectID := os.Getenv("HANDSON_BIG_QUERY_ID")
+	//projectID := os.Getenv("HANDSON_BIG_QUERY_ID")
+	projectID := "handsonpractice-443012"
 
 	key := os.Getenv("BIGQUERY_JSON")
 	// 認証情報をJSONファイルから読み込む
@@ -23,6 +24,7 @@ func main() {
 	defer client.Close()
 
 	query(ctx, client)
+	copyTable(ctx, client)
 }
 
 func query(ctx context.Context, client *bq.Client) {
@@ -50,4 +52,30 @@ func query(ctx context.Context, client *bq.Client) {
 
 		fmt.Println(values)
 	}
+}
+
+func copyTable(ctx context.Context, client *bq.Client) {
+
+	dataset := client.Dataset("{input_data_set}")
+
+	// コピー元のテーブルから、新テーブルを作成
+	copier := dataset.Table("{input_new_table}").CopierFrom(dataset.Table("{input_copy_table}"))
+	copier.WriteDisposition = bq.WriteTruncate
+
+	job, err := copier.Run(ctx)
+	if err != nil {
+		fmt.Println("Failed to Copy Job:%v", err)
+	}
+
+	// ジョブが完了まで待機
+	status, err := job.Wait(ctx)
+	if err != nil {
+		fmt.Println("Failed to Copy Job:%v", err)
+	}
+
+	if err := status.Err(); err != nil {
+		fmt.Println("Failed to copy job:%v", err)
+	}
+
+	fmt.Println("copy fin.")
 }
